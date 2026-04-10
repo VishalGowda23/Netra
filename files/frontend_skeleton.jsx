@@ -3,9 +3,9 @@ Autonomous Agent Governance Platform - Frontend
 React + TailwindCSS + Recharts
 
 This component shows:
-1. Real-time action flow (action → rules → memory → risk → decision)
-2. Risk heatmap (last 24 hours of decisions)
-3. Action history table (searchable, expandable)
+1. Real - time action flow(action → rules → memory → risk → decision)
+2. Risk heatmap(last 24 hours of decisions)
+3. Action history table(searchable, expandable)
 """
 
 // ============================================================================
@@ -34,7 +34,7 @@ export default function Dashboard() {
       const res = await fetch('http://localhost:8000/governance-metrics');
       const data = await res.json();
       setMetrics(data);
-      
+
       const auditRes = await fetch('http://localhost:8000/audit-log');
       const auditData = await auditRes.json();
       setActions(auditData);
@@ -83,7 +83,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         {/* Metrics Row */}
         {metrics && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -97,7 +97,7 @@ export default function Dashboard() {
 
         {/* Action Flow Panel (Real-time) */}
         <div className="mb-8">
-          <ActionFlowPanel 
+          <ActionFlowPanel
             onSubmitAction={submitTestAction}
             loading={loading}
           />
@@ -220,7 +220,7 @@ export default function ActionFlowPanel({ onSubmitAction, loading }) {
         amount: 5000,
         customer_id: 'cust_456',
         customer_tier: 'bronze',
-        timestamp: new Date(Date.now() - 3*60*60*1000).toISOString(), // 3 AM
+        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 AM
       },
       expectedDecision: 'ESCALATE'
     }
@@ -236,7 +236,7 @@ export default function ActionFlowPanel({ onSubmitAction, loading }) {
       <h2 className="text-xl font-semibold text-slate-900 mb-4">
         📋 Demo Scenarios
       </h2>
-      
+
       <div className="space-y-4">
         {/* Scenario Selector */}
         <div>
@@ -261,11 +261,11 @@ export default function ActionFlowPanel({ onSubmitAction, loading }) {
           <p className="text-sm text-slate-700">
             <strong>Expected Decision:</strong>{' '}
             <span className={
-              scenarios[selectedScenario].expectedDecision === 'APPROVE' 
-                ? 'text-green-600' 
+              scenarios[selectedScenario].expectedDecision === 'APPROVE'
+                ? 'text-green-600'
                 : scenarios[selectedScenario].expectedDecision === 'BLOCK'
-                ? 'text-red-600'
-                : 'text-yellow-600'
+                  ? 'text-red-600'
+                  : 'text-yellow-600'
             }>
               {scenarios[selectedScenario].expectedDecision}
             </span>
@@ -310,24 +310,24 @@ export default function RiskHeatmap({ decisions }) {
       <h2 className="text-lg font-semibold text-slate-900 mb-4">
         📊 Risk Score Trend
       </h2>
-      
+
       {chartData.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData}>
             <CartesianGrid stroke="#e2e8f0" />
             <XAxis dataKey="time" stroke="#94a3b8" />
             <YAxis stroke="#94a3b8" />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#fff', 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#fff',
                 border: '1px solid #e2e8f0',
                 borderRadius: '6px'
               }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="risk" 
-              stroke="#ef4444" 
+            <Line
+              type="monotone"
+              dataKey="risk"
+              stroke="#ef4444"
               strokeWidth={2}
               dot={{ fill: '#ef4444', r: 4 }}
             />
@@ -351,7 +351,7 @@ export default function ActionHistory({ actions }) {
   const [expandedId, setExpandedId] = useState(null);
 
   const getDecisionColor = (decision) => {
-    switch(decision) {
+    switch (decision) {
       case 'APPROVE': return 'bg-green-100 text-green-800';
       case 'BLOCK': return 'bg-red-100 text-red-800';
       case 'ESCALATE': return 'bg-yellow-100 text-yellow-800';
@@ -382,8 +382,8 @@ export default function ActionHistory({ actions }) {
             </thead>
             <tbody>
               {actions.map((action) => (
-                <tr 
-                  key={action.action_id} 
+                <tr
+                  key={action.action_id}
                   className="border-b border-slate-200 hover:bg-slate-50 cursor-pointer"
                   onClick={() => setExpandedId(
                     expandedId === action.action_id ? null : action.action_id
@@ -396,18 +396,16 @@ export default function ActionHistory({ actions }) {
                     {action.action_id.slice(0, 12)}...
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                      action.risk_score > 70 ? 'bg-red-100 text-red-800' :
-                      action.risk_score > 40 ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+                    <span className={`px-2 py-1 rounded text-xs font-semibold ${action.risk_score > 70 ? 'bg-red-100 text-red-800' :
+                        action.risk_score > 40 ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                      }`}>
                       {action.risk_score.toFixed(0)}%
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      getDecisionColor(action.decision)
-                    }`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getDecisionColor(action.decision)
+                      }`}>
                       {action.decision}
                     </span>
                   </td>

@@ -45,7 +45,7 @@ export function GlobalHeader({
   };
 
   return (
-    <header className="neo-card mb-4 flex items-center justify-between px-6 py-3 bg-white shrink-0 relative z-[100]">
+    <header className="neo-card mb-4 flex items-center justify-between px-6 py-3 bg-white shrink-0 relative z-20">
       <div className="flex items-center gap-3">
         <div className="bg-primary text-white p-2 border-2 border-black rounded-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
           <Activity size={24} />
@@ -74,7 +74,7 @@ export function GlobalHeader({
             <ChevronDown size={12} />
           </button>
           {langOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-[9999] rounded-sm overflow-hidden">
+            <div className="absolute right-0 top-full mt-1 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-[100] rounded-sm overflow-hidden min-w-[120px]">
               {(Object.entries(LANGUAGE_NAMES) as [Language, string][]).map(([code, name]) => (
                 <button
                   key={code}

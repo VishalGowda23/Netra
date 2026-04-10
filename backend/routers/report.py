@@ -80,7 +80,7 @@ async def generate_cio_brief():
             f"Of these, {blocked} were dangerous and were automatically stopped before they could cause harm. "
         )
         if loss_prevented > 0:
-            plain += f"This saved the organization an estimated ₹{loss_prevented:,.0f}. "
+            plain += f"This saved the organization an estimated Rs.{loss_prevented:,.0f}. "
         if escalated > 0:
             plain += f"{escalated} actions needed a human to make the final call. "
         plain += "The system is working as intended - catching risky AI behavior before it happens."
@@ -97,7 +97,7 @@ async def generate_cio_brief():
     summary = (
         f"NETRA processed {total} AI agent actions this period. "
         f"{blocked} actions were blocked ({block_rate}% block rate), "
-        f"preventing an estimated ₹{loss_prevented:,.0f} in potential damage. "
+        f"preventing an estimated Rs.{loss_prevented:,.0f} in potential damage. "
         f"{escalated} actions were escalated for human review. "
         f"The governance system delivered a {roi_multiplier}x return on investment."
     )
@@ -123,7 +123,7 @@ async def generate_cio_brief():
         ("Escalated", str(escalated)),
         ("Avg Risk Score", f"{avg_risk:.1f}"),
         ("Max Risk Score", f"{max_risk:.1f}"),
-        ("Damage Prevented", f"₹{loss_prevented:,.0f}"),
+        ("Damage Prevented", f"Rs.{loss_prevented:,.0f}"),
         ("ROI Multiplier", f"{roi_multiplier}x"),
     ]
 
