@@ -12,7 +12,8 @@ router = APIRouter(prefix="/api/v1", tags=["roi"])
 logger = logging.getLogger(__name__)
 
 # Cost per governance evaluation (simulated operational cost)
-COST_PER_EVALUATION = 0.12  # ₹0.12 per evaluation
+COST_PER_EVALUATION = 45.0  # ₹45 per evaluation
+BASELINE_INFRA_COST = 25000.0  # Baseline monthly infra cost
 
 
 @router.get("/roi-summary")
@@ -72,8 +73,8 @@ async def roi_summary():
                 "time": row[5],
             })
 
-    # Calculate ROI
-    governance_cost = total_evaluations * COST_PER_EVALUATION
+    # Calculate ROI with realistic enterprise costs
+    governance_cost = BASELINE_INFRA_COST + (total_evaluations * COST_PER_EVALUATION)
     roi_multiplier = (
         round(damage_prevented / governance_cost, 1)
         if governance_cost > 0

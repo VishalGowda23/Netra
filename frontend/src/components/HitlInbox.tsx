@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Inbox, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import type { GovernanceDecision } from "../types";
+import { useTranslation } from "../i18n/useTranslation";
 
 export function HitlInbox({ 
   logs, 
@@ -14,6 +15,7 @@ export function HitlInbox({
   onResolve: (id: string) => void,
   onClose: () => void 
 }) {
+  const { t } = useTranslation();
   const escalations = useMemo(() => logs.filter(l => l.decision === "ESCALATE"), [logs]);
   const activeEscalations = escalations.filter(e => !resolvedIds.has(e.action_id));
 
@@ -28,7 +30,7 @@ export function HitlInbox({
         <div className="bg-warning text-black p-4 flex items-center justify-between border-b-4 border-black">
           <div className="flex items-center gap-3">
             <Inbox size={28} className="fill-black/10" />
-            <h2 className="font-black text-2xl tracking-wider uppercase">Supervisory Review Queue</h2>
+            <h2 className="font-black text-2xl tracking-wider uppercase">{t("queue") || "Supervisory Review Queue"}</h2>
             {activeEscalations.length > 0 && (
               <span className="bg-danger text-white px-2 py-0.5 rounded-full text-xs font-bold font-mono">
                 {activeEscalations.length} PENDING

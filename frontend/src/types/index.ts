@@ -9,6 +9,7 @@ export interface GovernanceDecision {
   decision: DecisionType;
   risk_score: number;
   reasoning: string;
+  simple_explanation: string;
   rule_violations: Array<{ rule: string; message: string; severity: string }>;
   memory_warnings: Array<{ type: string; message: string; severity: string }>;
   anomaly_score: number;

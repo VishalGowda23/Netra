@@ -7,9 +7,12 @@
   --color-warning: #FFD95A;
   --color-danger: #FF6B6B;
   --color-charcoal: #1F2933;
-  --color-background: #F7F7F7;
+  --color-background: #F0F2F5;
   --color-neo-border: #000000;
 }
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
 /* Neo-Brutalism Base Styles */
 body {
@@ -28,6 +31,10 @@ body {
   @apply border-3 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-sm font-bold active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer;
 }
 
+.neo-btn {
+  @apply border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] rounded-sm font-bold active:translate-y-[1px] active:translate-x-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer;
+}
+
 .neo-badge {
   @apply border-2 border-black rounded-sm font-bold uppercase tracking-wider text-xs px-2 py-1;
 }
@@ -36,4 +43,38 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   font-weight: 700;
+}
+
+/* Mono text utility */
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Card hover lift effect */
+.neo-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 0px 0px rgba(0,0,0,1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD2D9;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9AA5B4;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-primary);
+  color: white;
 }

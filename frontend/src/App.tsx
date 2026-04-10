@@ -8,6 +8,7 @@ import { RogueAgentSimulator } from "./components/RogueAgentSimulator";
 import { MemoryExplorer } from "./components/MemoryExplorer";
 import { HitlInbox } from "./components/HitlInbox";
 import { type GovernanceDecision, type GovernanceMetrics } from "./types";
+import { narrateDecision } from "./lib/narrator";
 
 function App() {
   const [showDemo, setShowDemo] = useState(false);
@@ -20,12 +21,12 @@ function App() {
 
   const pendingEscalationsCount = logs.filter(l => l.decision === "ESCALATE" && !resolvedInboxIds.has(l.action_id)).length;
 
-  // Clear the current decision after 10 seconds of inactivity
+  // Clear the current decision after 15 seconds of inactivity
   useEffect(() => {
     if (currentDecision) {
       const timer = setTimeout(() => {
         setCurrentDecision(null);
-      }, 10000);
+      }, 15000);
       return () => clearTimeout(timer);
     }
   }, [currentDecision]);
@@ -42,11 +43,17 @@ function App() {
           const data = await logsRes.json();
           setLogs(data.items);
         }
+
       } catch (err) {
         console.error("Failed to fetch initial data", err);
       }
     };
     fetchInitialData();
+
+    // Preload speech synthesis voices
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+    }
   }, []);
 
   // SSE Subscription for real-time events
@@ -60,15 +67,18 @@ function App() {
     eventSource.addEventListener("decision", (e) => {
       const payload = JSON.parse(e.data);
       console.log("SSE Decision payload:", payload);
-      
+
       const newDecision: GovernanceDecision = payload.data;
-      
+
       // Update central pipeline animation
       setCurrentDecision(newDecision);
-      
+
       // Prepend to logs
       setLogs((prevLogs) => [newDecision, ...prevLogs].slice(0, 50));
-      
+
+      // Voice narration for BLOCK/ESCALATE
+      narrateDecision(newDecision);
+
       // Optimistically update metrics
       setMetrics((prev) => {
         if (!prev) return prev;
@@ -76,7 +86,7 @@ function App() {
         const blocked = prev.blocked + (newDecision.decision === "BLOCK" ? 1 : 0);
         const approved = prev.approved + (newDecision.decision === "APPROVE" ? 1 : 0);
         const escalated = prev.escalated + (newDecision.decision === "ESCALATE" ? 1 : 0);
-        
+
         return {
           ...prev,
           total_decisions: total,
@@ -84,8 +94,7 @@ function App() {
           approved,
           escalated,
           block_rate: ((blocked / total) * 100).toFixed(1) + "%",
-          // Rough avg risk update
-          avg_risk_score: prev.avg_risk_score // keep static for optimism or calculate properly later
+          avg_risk_score: prev.avg_risk_score
         };
       });
     });
@@ -97,8 +106,8 @@ function App() {
 
   return (
     <div className="min-h-screen p-4 flex flex-col font-sans relative overflow-x-hidden">
-      <GlobalHeader 
-        onDemoTrigger={() => setShowDemo(true)} 
+      <GlobalHeader
+        onDemoTrigger={() => setShowDemo(true)}
         onMemoryTrigger={() => setShowMemory(!showMemory)}
         onInboxTrigger={() => setShowInbox(true)}
         pendingEscalationsCount={pendingEscalationsCount}
@@ -126,15 +135,15 @@ function App() {
       </div>
 
       {showDemo && <RogueAgentSimulator onClose={() => setShowDemo(false)} />}
-      
+
       {showMemory && <MemoryExplorer onClose={() => setShowMemory(false)} />}
-      
+
       {showInbox && (
-        <HitlInbox 
-          logs={logs} 
+        <HitlInbox
+          logs={logs}
           resolvedIds={resolvedInboxIds}
           onResolve={(id) => setResolvedInboxIds(prev => new Set(prev).add(id))}
-          onClose={() => setShowInbox(false)} 
+          onClose={() => setShowInbox(false)}
         />
       )}
     </div>

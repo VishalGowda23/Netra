@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Bot, AlertTriangle, Key, Activity, GitCommit } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "../i18n/useTranslation";
 
 interface Agent {
   id: string;
@@ -35,6 +36,7 @@ const MOCK_AGENTS: Agent[] = [
 ];
 
 export function AgentRadar() {
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
@@ -44,8 +46,8 @@ export function AgentRadar() {
   return (
     <div className="neo-card p-4 flex flex-col h-full bg-[#fdfdfd]">
       <h2 className="text-xl font-bold border-b-3 border-black pb-3 mb-4 flex items-center justify-between">
-        Agent Radar
-        <span className="neo-badge bg-primary text-white border-black">{MOCK_AGENTS.length} ACTIVE</span>
+        {t("agent_radar")}
+        <span className="neo-badge bg-primary text-white border-black">{MOCK_AGENTS.length} {t("active")}</span>
       </h2>
 
       <div className="flex-1 overflow-y-auto pr-2 space-y-4">
@@ -70,7 +72,7 @@ export function AgentRadar() {
 
             <div className="mt-3">
               <div className="flex justify-between text-xs font-bold mb-1">
-                <span>TRUST SCORE</span>
+                <span>{t("trust_score")}</span>
                 <span className={agent.trustScore < 50 ? "text-danger" : "text-success"}>
                   {agent.trustScore}%
                 </span>

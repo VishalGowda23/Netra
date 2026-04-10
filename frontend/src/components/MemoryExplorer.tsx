@@ -2,8 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Search, Database, Fingerprint, ShieldAlert, BadgeDollarSign } from "lucide-react";
 import type { MemoryInsight } from "../types";
+import { useTranslation } from "../i18n/useTranslation";
 
 export function MemoryExplorer({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   const [customerId, setCustomerId] = useState("");
   const [insight, setInsight] = useState<MemoryInsight | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,12 +37,12 @@ export function MemoryExplorer({ onClose }: { onClose: () => void }) {
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
-        className="fixed top-0 right-0 bottom-0 w-[450px] bg-[#fdfdfd] border-l-4 border-black z-50 shadow-[-15px_0_30px_rgba(0,0,0,0.2)] flex flex-col"
+        className="fixed top-0 right-0 bottom-0 w-[450px] bg-[#fdfdfd] border-l-4 border-black z-[9999] shadow-[-15px_0_30px_rgba(0,0,0,0.2)] flex flex-col"
       >
         <div className="p-4 bg-black text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Database size={24} className="text-secondary" />
-            <h2 className="font-black text-xl tracking-wider">MEMORY VAULT</h2>
+            <h2 className="font-black text-xl tracking-wider">{t("memory_vault")}</h2>
           </div>
           <button onClick={onClose} className="hover:text-danger switch-transition">
             <X size={28} />
