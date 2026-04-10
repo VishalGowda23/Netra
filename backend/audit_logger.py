@@ -5,10 +5,12 @@ Persistent audit trail for all governance decisions
 
 import json
 import logging
+import asyncio
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from models import AgentAction, DecisionResult, AuditLogEntry
+from config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +54,39 @@ class AuditLogger:
                 ),
             )
             await db.commit()
+
+        # If it's a BLOCK or ESCALATE, potentially send a WhatsApp alert
+        if decision.decision in ("BLOCK", "ESCALATE"):
+            asyncio.create_task(self._send_whatsapp_alert(action, decision))
+
+    async def _send_whatsapp_alert(self, action: AgentAction, decision: DecisionResult):
+        """Send a WhatsApp alert via Twilio if configured."""
+        if not all([settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN, settings.TWILIO_WHATSAPP_FROM, settings.TWILIO_WHATSAPP_TO]):
+            return
+
+        try:
+            from twilio.rest import Client
+            client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+            
+            emoji = "🛑" if decision.decision == "BLOCK" else "⚠️"
+            message_body = (
+                f"{emoji} *NETRA GOVERNANCE ALERT* {emoji}\n\n"
+                f"*Action:* {action.action_type.upper()}\n"
+                f"*Agent:* {action.agent_name}\n"
+                f"*Amount:* ₹{action.amount:,.0f}\n"
+                f"*Risk Score:* {decision.risk_score:.1f}/100\n"
+                f"*Decision:* {decision.decision}\n\n"
+                f"*Explanation:*\n{getattr(decision, 'simple_explanation', decision.reasoning)}"
+            )
+
+            client.messages.create(
+                from_=settings.TWILIO_WHATSAPP_FROM,
+                body=message_body,
+                to=settings.TWILIO_WHATSAPP_TO
+            )
+            logger.info("Sent WhatsApp alert successfully")
+        except Exception as e:
+            logger.error(f"Failed to send WhatsApp alert: {e}")
 
     async def get_logs(
         self,

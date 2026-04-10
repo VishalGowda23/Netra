@@ -87,6 +87,7 @@ class DecisionResult(BaseModel):
     decision: Decision
     risk_score: float = Field(..., ge=0, le=100)
     reasoning: str
+    simple_explanation: str = Field("", description="Plain-English explanation for non-technical stakeholders")
     rule_violations: List[RuleViolation]
     memory_warnings: List[MemoryWarning]
     anomaly_score: float = Field(..., ge=0)

@@ -71,9 +71,27 @@ async def generate_cio_brief():
     pdf.cell(0, 6, f"Generated: {now}", new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.ln(10)
 
-    # Executive Summary
     pdf.set_font("Helvetica", "B", 14)
-    pdf.cell(0, 10, "Executive Summary", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, "What This Means (Plain English)", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    if total > 0:
+        plain = (
+            f"In simple terms: NETRA reviewed {total} actions that AI agents tried to perform. "
+            f"Of these, {blocked} were dangerous and were automatically stopped before they could cause harm. "
+        )
+        if loss_prevented > 0:
+            plain += f"This saved the organization an estimated Rs.{loss_prevented:,.0f}. "
+        if escalated > 0:
+            plain += f"{escalated} actions needed a human to make the final call. "
+        plain += "The system is working as intended - catching risky AI behavior before it happens."
+    else:
+        plain = "No AI agent actions have been processed yet. The system is standing by."
+    pdf.multi_cell(0, 5, plain)
+    pdf.ln(8)
+
+    # Executive Summary (Technical)
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.cell(0, 10, "Executive Summary (Technical)", new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 10)
     block_rate = f"{(blocked / total * 100):.1f}" if total > 0 else "0"
     summary = (
@@ -182,7 +200,7 @@ async def generate_cio_brief():
     buffer = io.BytesIO(pdf_bytes)
     buffer.seek(0)
 
-    filename = f"agent_conscience_brief_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
+    filename = f"netra_brief_{datetime.utcnow().strftime('%Y%m%d')}.pdf"
     return StreamingResponse(
         buffer,
         media_type="application/pdf",

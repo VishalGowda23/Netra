@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     # ── Discord Webhook (alerts on BLOCK/ESCALATE) ───────────────────────
     DISCORD_WEBHOOK_URL: Optional[str] = None
 
+    # ── Twilio (WhatsApp alerts on BLOCK) ────────────────────────────────
+    TWILIO_ACCOUNT_SID: Optional[str] = None
+    TWILIO_AUTH_TOKEN: Optional[str] = None
+    TWILIO_WHATSAPP_FROM: Optional[str] = None  # e.g. "whatsapp:+14155238886"
+    TWILIO_WHATSAPP_TO: Optional[str] = None
+
     # ── Risk Scoring Thresholds ──────────────────────────────────────────
     RISK_BLOCK_THRESHOLD: float = 70.0
     RISK_ESCALATE_THRESHOLD: float = 40.0

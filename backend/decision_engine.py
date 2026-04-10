@@ -87,11 +87,18 @@ class DecisionEngine:
         if has_block_rule:
              final_decision = "BLOCK"
                 
+        # ── Generate Simple Explanation ──────────────────────────────────
+        simple_explanation = self._generate_simple_explanation(
+            action, final_decision, risk_result["score"],
+            rule_violations, memory_warnings, anomaly_result
+        )
+
         decision = DecisionResult(
             action_id=action.action_id,
             decision=final_decision,
             risk_score=risk_result["score"],
             reasoning=risk_result["explanation"],
+            simple_explanation=simple_explanation,
             rule_violations=rule_violations,
             memory_warnings=memory_warnings,
             anomaly_score=anomaly_result["anomaly_score"],
@@ -113,3 +120,69 @@ class DecisionEngine:
         )
 
         return decision
+
+    def _generate_simple_explanation(
+        self,
+        action: AgentAction,
+        final_decision: str,
+        risk_score: float,
+        rule_violations: List[RuleViolation],
+        memory_warnings: List[MemoryWarning],
+        anomaly_result: Dict[str, Any],
+    ) -> str:
+        """
+        Generate a plain-English explanation that a non-technical person
+        (CEO, compliance officer, hackathon judge) can immediately understand.
+        """
+        agent = action.agent_name
+        action_desc = f"{action.action_type} of ₹{action.amount:,.0f}"
+        customer = action.customer_id
+
+        if final_decision == "APPROVE":
+            return (
+                f"✅ Safe to proceed. {agent} requested a {action_desc} for customer {customer}. "
+                f"All checks passed — no policy violations, no fraud history, and the request "
+                f"looks normal compared to typical patterns. Risk score: {risk_score:.0f}/100 (low)."
+            )
+
+        parts = []
+        parts.append(
+            f"{'🛑 Blocked' if final_decision == 'BLOCK' else '⚠️ Flagged for human review'}. "
+            f"{agent} tried to perform a {action_desc} for customer {customer}."
+        )
+
+        # Explain rule violations in plain English
+        if rule_violations:
+            violation_reasons = []
+            for v in rule_violations:
+                if "limit" in v.rule.lower() or "refund" in v.rule.lower():
+                    violation_reasons.append("the amount exceeds the allowed limit for this type of transaction")
+                elif "tier" in v.rule.lower() or "customer" in v.rule.lower():
+                    violation_reasons.append("the customer account doesn't have the required trust level")
+                elif "hour" in v.rule.lower() or "time" in v.rule.lower():
+                    violation_reasons.append("it was attempted at an unusual time (outside business hours)")
+                else:
+                    violation_reasons.append(v.message.lower())
+            unique_reasons = list(dict.fromkeys(violation_reasons))  # deduplicate
+            parts.append(f"This was flagged because {', and '.join(unique_reasons[:3])}.")
+
+        # Explain memory warnings
+        if memory_warnings:
+            fraud_warnings = [w for w in memory_warnings if "fraud" in w.type.lower()]
+            if fraud_warnings:
+                parts.append(
+                    "Our system also found this customer linked to a previous fraud incident on record."
+                )
+
+        # Explain anomaly
+        if anomaly_result.get("is_anomaly"):
+            parts.append(
+                f"Additionally, our AI model flagged this as statistically unusual — "
+                f"it doesn't match the normal pattern of transactions we typically see."
+            )
+
+        # Risk summary
+        risk_level = "very high" if risk_score > 70 else "elevated" if risk_score > 40 else "moderate"
+        parts.append(f"Overall risk level: {risk_level} ({risk_score:.0f}/100).")
+
+        return " ".join(parts)
