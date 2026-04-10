@@ -53,7 +53,6 @@ type TranslationKey =
   | "action_type"
   | "what_if_title"
   | "what_if_desc"
-  | "total_saved"
   | "live_agent"
   | "manual_scenarios"
   | "safe_action"
@@ -103,7 +102,6 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     action_type: "Action Type",
     what_if_title: "What-If Playground",
     what_if_desc: "Test any scenario — adjust the parameters and see what NETRA would do.",
-    total_saved: "Total Prevented",
     live_agent: "Live AI Agent",
     manual_scenarios: "Manual Scenarios",
     safe_action: "SAFE ACTION",
@@ -152,7 +150,6 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     action_type: "कार्रवाई प्रकार",
     what_if_title: "क्या-अगर खेल का मैदान",
     what_if_desc: "किसी भी परिदृश्य का परीक्षण करें — पैरामीटर समायोजित करें और देखें NETRA क्या करेगा।",
-    total_saved: "कुल रोका गया",
     live_agent: "लाइव AI एजेंट",
     manual_scenarios: "मैन्युअल परिदृश्य",
     safe_action: "सुरक्षित कार्य",
@@ -201,7 +198,6 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     action_type: "Tipo de Acción",
     what_if_title: "Laboratorio ¿Qué Pasaría Si?",
     what_if_desc: "Prueba cualquier escenario — ajusta los parámetros y observa qué haría NETRA.",
-    total_saved: "Total Prevenido",
     live_agent: "Agente IA en Vivo",
     manual_scenarios: "Escenarios Manuales",
     safe_action: "ACCIÓN SEGURA",
@@ -250,7 +246,6 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     action_type: "कृती प्रकार",
     what_if_title: "काय-जर खेळाचे मैदान",
     what_if_desc: "कोणत्याही परिस्थितीची चाचणी घ्या - मापदंड समायोजित करा आणि NETRA काय करेल ते पहा.",
-    total_saved: "एकूण प्रतिबंधित",
     live_agent: "थेट AI एजंट",
     manual_scenarios: "मॅन्युअल परिस्थिती",
     safe_action: "सुरक्षित कृती",

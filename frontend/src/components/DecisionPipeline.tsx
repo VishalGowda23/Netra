@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { type GovernanceDecision } from "../types";
-import { Server, Database, BrainCircuit, ActivitySquare, CheckCircle, OctagonAlert, Eye, Code, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { Server, Database, BrainCircuit, ActivitySquare, CheckCircle, OctagonAlert, Eye, Code, ChevronRight, Share2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "../i18n/useTranslation";
 
 interface DecisionPipelineProps {
@@ -11,11 +11,20 @@ interface DecisionPipelineProps {
 export function DecisionPipeline({ currentDecision }: DecisionPipelineProps) {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<"simple" | "technical">("simple");
+  const [showTransmitStatus, setShowTransmitStatus] = useState(false);
   const isIdle = !currentDecision;
 
   const isBlock = currentDecision?.decision === "BLOCK";
   const isApprove = currentDecision?.decision === "APPROVE";
   const isEscalate = currentDecision?.decision === "ESCALATE";
+
+  useEffect(() => {
+    if (isBlock || isEscalate) {
+      setShowTransmitStatus(true);
+      const timer = setTimeout(() => setShowTransmitStatus(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentDecision?.action_id, isBlock, isEscalate]);
 
   const getNodeColor = (isActive: boolean, hasFailed: boolean = false) => {
     if (hasFailed) return "border-danger bg-danger/10 text-danger shadow-[0_0_20px_rgba(255,107,107,0.6)]";
@@ -169,6 +178,21 @@ export function DecisionPipeline({ currentDecision }: DecisionPipelineProps) {
           <div className="mt-2 text-center font-bold text-sm uppercase tracking-widest">
             {isIdle ? t("waiting") : currentDecision.decision === "BLOCK" ? t("blocked") : currentDecision.decision === "APPROVE" ? t("approved") : t("escalated")}
           </div>
+
+          <AnimatePresence>
+            {showTransmitStatus && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="absolute -bottom-10 flex items-center gap-2 bg-black text-white px-3 py-1.5 rounded-sm border-2 border-white/20 text-[10px] font-bold z-20 whitespace-nowrap shadow-xl"
+              >
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                <Share2 size={12} className="animate-bounce" />
+                TRANSMITTING WHATSAPP ALERT...
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -211,7 +235,7 @@ export function DecisionPipeline({ currentDecision }: DecisionPipelineProps) {
             <div className="space-y-1.5">
               <div><span className="text-gray-500">ACTION_ID:</span> {currentDecision.action_id}</div>
               <div><span className="text-gray-500">AGENT:</span> {currentDecision.agent_name}</div>
-              <div><span className="text-gray-500">INTENT:</span> {currentDecision.action_type?.toUpperCase()} — ₹{currentDecision.amount?.toLocaleString()}</div>
+              <div><span className="text-gray-500">INTENT:</span> {currentDecision.action_type?.toUpperCase()} — Rs.{currentDecision.amount?.toLocaleString()}</div>
               <div><span className="text-gray-500">RISK_SCORE:</span> {currentDecision.risk_score?.toFixed(2)}</div>
               <div><span className="text-gray-500">ANOMALY_SCORE:</span> {currentDecision.anomaly_score?.toFixed(2)}</div>
 
@@ -251,6 +275,29 @@ export function DecisionPipeline({ currentDecision }: DecisionPipelineProps) {
             {t("monitoring")}
           </div>
         </div>
+      )}
+
+      {/* Aesthetic Overlays */}
+      {!isIdle && (
+        <>
+          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+            <motion.div 
+               initial={{ y: "-100%" }}
+               animate={{ y: "100%" }}
+               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+               className="w-full h-24 bg-gradient-to-b from-transparent via-primary/10 to-transparent opacity-30 shadow-[0_0_15px_rgba(58,91,255,0.4)]"
+            />
+          </div>
+          <div className="absolute inset-0 pointer-events-none border-4 border-black z-20" />
+        </>
+      )}
+
+      {isBlock && (
+        <motion.div 
+          animate={{ opacity: [0, 0.2, 0] }}
+          transition={{ duration: 0.1, repeat: 5 }}
+          className="absolute inset-0 bg-danger pointer-events-none z-30"
+        />
       )}
     </div>
   );

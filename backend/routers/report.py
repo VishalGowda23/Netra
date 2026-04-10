@@ -53,8 +53,8 @@ async def generate_cio_brief():
         )
         top_risks = await cursor.fetchall()
 
-    governance_cost = total * 0.12
-    roi = round(loss_prevented / governance_cost, 1) if governance_cost > 0 else 0
+    governance_cost = 25000 + (total * 45)
+    roi_multiplier = round(loss_prevented / governance_cost, 2) if governance_cost > 0 else 0
     now = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
 
     # ── Build PDF ────────────────────────────────────────────────────────
@@ -80,7 +80,7 @@ async def generate_cio_brief():
             f"Of these, {blocked} were dangerous and were automatically stopped before they could cause harm. "
         )
         if loss_prevented > 0:
-            plain += f"This saved the organization an estimated Rs.{loss_prevented:,.0f}. "
+            plain += f"This saved the organization an estimated ₹{loss_prevented:,.0f}. "
         if escalated > 0:
             plain += f"{escalated} actions needed a human to make the final call. "
         plain += "The system is working as intended - catching risky AI behavior before it happens."
@@ -97,9 +97,9 @@ async def generate_cio_brief():
     summary = (
         f"NETRA processed {total} AI agent actions this period. "
         f"{blocked} actions were blocked ({block_rate}% block rate), "
-        f"preventing an estimated Rs.{loss_prevented:,.0f} in potential damage. "
+        f"preventing an estimated ₹{loss_prevented:,.0f} in potential damage. "
         f"{escalated} actions were escalated for human review. "
-        f"The governance system delivered a {roi}x return on investment."
+        f"The governance system delivered a {roi_multiplier}x return on investment."
     )
     pdf.multi_cell(0, 5, summary)
     pdf.ln(8)
@@ -123,8 +123,8 @@ async def generate_cio_brief():
         ("Escalated", str(escalated)),
         ("Avg Risk Score", f"{avg_risk:.1f}"),
         ("Max Risk Score", f"{max_risk:.1f}"),
-        ("Damage Prevented", f"Rs.{loss_prevented:,.0f}"),
-        ("ROI Multiplier", f"{roi}x"),
+        ("Damage Prevented", f"₹{loss_prevented:,.0f}"),
+        ("ROI Multiplier", f"{roi_multiplier}x"),
     ]
 
     for i in range(0, len(metrics), 2):
@@ -154,7 +154,7 @@ async def generate_cio_brief():
         for r in top_risks:
             pdf.cell(widths[0], 6, str(r[0])[:15], border=1)
             pdf.cell(widths[1], 6, str(r[1])[:12], border=1)
-            pdf.cell(widths[2], 6, f"Rs.{r[2]:,.0f}", border=1, align="R")
+            pdf.cell(widths[2], 6, f"\u20B9{r[2]:,.0f}", border=1, align="R")
             pdf.cell(widths[3], 6, f"{r[3]:.0f}", border=1, align="C")
             pdf.cell(widths[4], 6, str(r[4])[:12], border=1)
             pdf.cell(widths[5], 6, str(r[5])[:40], border=1)
