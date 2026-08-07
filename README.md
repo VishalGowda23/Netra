@@ -125,5 +125,3 @@ Once both systems are running, you can demonstrate the Agent Governance Intercep
     │   └── lib/               => Utilities and SSE hooks
 ```
 
-## 🤝 Project Credits
-Built for SunHacks. Netra enables the ethical scaling of enterprise AI.
